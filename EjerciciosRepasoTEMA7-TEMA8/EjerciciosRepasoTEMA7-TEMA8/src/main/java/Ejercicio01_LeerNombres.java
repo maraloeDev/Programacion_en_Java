@@ -27,7 +27,7 @@ public class Ejercicio01_LeerNombres {
      */
 
     static File f = new File("empleados.csv");
-    static ArrayList<Ejercicio01_Empleado> listaEmpleados = new ArrayList<>();
+    static ArrayList<Ejercicio01> listaEmpleados = new ArrayList<>();
 
     public static void escrituraCSV(File f) {
 
@@ -36,12 +36,12 @@ public class Ejercicio01_LeerNombres {
             String[] cabecera = {"nombre", "edad", "puesto"};
             csvWriter.writeNext(cabecera);
 
-            listaEmpleados.add(new Ejercicio01_Empleado("Carlos", "45", "Ingeniero"));
-            listaEmpleados.add(new Ejercicio01_Empleado("Juan", "24", "Matematico"));
-            listaEmpleados.add(new Ejercicio01_Empleado("Maria", "18", "Streamer"));
+            listaEmpleados.add(new Ejercicio01("Carlos", "45", "Ingeniero"));
+            listaEmpleados.add(new Ejercicio01("Juan", "24", "Matematico"));
+            listaEmpleados.add(new Ejercicio01("Maria", "18", "Streamer"));
 
             // Agregas los empleados, luego lo recorres, y vas añadiendo los empleados al CSV
-            for (Ejercicio01_Empleado empleado1 : listaEmpleados) {
+            for (Ejercicio01 empleado1 : listaEmpleados) {
                 csvWriter.writeNext(empleado1.toCSV());
             }
                 System.out.println("Datos escritos correctamente");

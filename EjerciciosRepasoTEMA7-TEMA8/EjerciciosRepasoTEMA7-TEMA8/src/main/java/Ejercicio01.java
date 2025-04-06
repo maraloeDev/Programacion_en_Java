@@ -1,10 +1,10 @@
-public class Ejercicio01_Empleado {
+public class Ejercicio01 {
 
     private String nombre;
     private String edad;
     private String puesto;
 
-    public Ejercicio01_Empleado(String nombre, String edad, String puesto) {
+    public Ejercicio01(String nombre, String edad, String puesto) {
         this.nombre = nombre;
         this.edad = edad;
         this.puesto = puesto;

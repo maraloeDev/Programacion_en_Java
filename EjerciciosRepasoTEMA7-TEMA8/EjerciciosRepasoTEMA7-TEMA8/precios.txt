@@ -1,0 +1,2 @@
+Producto1=20.0
+Producto2=60.0

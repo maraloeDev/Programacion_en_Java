@@ -15,9 +15,9 @@ import javax.swing.event.ListSelectionListener;
 /**
  *
  * @author macarena
- * 
- * Este ejemplo usa la vista Design para colocar los componentes, y el control de
- * eventso se hace mediante c�digo de forma completa.
+ *
+ * Este ejemplo usa la vista Design para colocar los componentes, y el control
+ * de eventso se hace mediante c�digo de forma completa.
  *
  */
 public class EjemploComoboLista extends javax.swing.JFrame implements ListSelectionListener,
@@ -55,7 +55,7 @@ public class EjemploComoboLista extends javax.swing.JFrame implements ListSelect
         //eventos
         this.jList1.addListSelectionListener(this);
         this.jComboBox1.addItemListener(this);
-        
+
     }
 
     /**
@@ -161,9 +161,9 @@ public class EjemploComoboLista extends javax.swing.JFrame implements ListSelect
     }
 
     @Override
-    public void itemStateChanged(ItemEvent e) {       
+    public void itemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
-             System.out.println("entra itemStateChange");
+            System.out.println("entra itemStateChange");
         } else if (e.getStateChange() == ItemEvent.DESELECTED) {
             //Do any operations you need to do when an item is de-selected.
         }

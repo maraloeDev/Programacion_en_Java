@@ -111,11 +111,12 @@ public class Ejercicio2 extends javax.swing.JFrame {
 
     private void botonCrearPrendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCrearPrendasActionPerformed
         listaPrendas.add(new Prenda("Camiseta manga corta", 'S', "Blanco", 5.99));
-        listaPrendas.add(new Prenda("Pantalon vaquero", 'M', "Azul medio", 30));
+        listaPrendas.add(new Prenda("Pantalon vaquero", 'M', "Azul", 30));
         listaPrendas.add(new Prenda("Camiseta dibujo", 'M', "Amarillo", 10));
         listaPrendas.add(new Prenda("Vestido largo flores ", 'S', "Varios", 50));
 
         JOptionPane.showMessageDialog(null, "Prendas creadas correctamente");
+        botonCrearPrendas.setEnabled(false);
     }//GEN-LAST:event_botonCrearPrendasActionPerformed
 
     private void botonMostrarPrendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonMostrarPrendasActionPerformed
@@ -144,6 +145,7 @@ public class Ejercicio2 extends javax.swing.JFrame {
             }
             if(encontrado) {
                 JOptionPane.showMessageDialog(null, "Color no encontrado", "Informacion", JOptionPane.ERROR_MESSAGE);
+               
         }
     }//GEN-LAST:event_botonBuscarPorColorActionPerformed
 

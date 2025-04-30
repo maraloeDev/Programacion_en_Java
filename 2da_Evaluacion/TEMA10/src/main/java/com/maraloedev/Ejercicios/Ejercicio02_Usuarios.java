@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -29,6 +30,8 @@ public class Ejercicio02_Usuarios extends javax.swing.JFrame {
     static PreparedStatement ps;
     static ResultSet rs;
 
+    static int intentos = 1;
+
     public Ejercicio02_Usuarios() {
         initComponents();
         setFrame();
@@ -38,6 +41,8 @@ public class Ejercicio02_Usuarios extends javax.swing.JFrame {
         setTitle("Login");
         setResizable(false);
         setLocationRelativeTo(null);
+        repeticionPass.setVisible(false);
+        passRepeat.setVisible(false);
     }
 
     /**
@@ -56,6 +61,8 @@ public class Ejercicio02_Usuarios extends javax.swing.JFrame {
         usuarioIntroducido = new javax.swing.JTextField();
         contrasenaIntroducida = new javax.swing.JPasswordField();
         registro = new javax.swing.JLabel();
+        repeticionPass = new javax.swing.JLabel();
+        passRepeat = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -80,6 +87,13 @@ public class Ejercicio02_Usuarios extends javax.swing.JFrame {
         registro.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         registro.setForeground(new java.awt.Color(0, 0, 204));
         registro.setText("<html><u>¿Todavia no te has registrado?</html></u>");
+        registro.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                registroMouseClicked(evt);
+            }
+        });
+
+        repeticionPass.setText("Confirmacion");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -95,6 +109,10 @@ public class Ejercicio02_Usuarios extends javax.swing.JFrame {
                                 .addGap(36, 36, 36)
                                 .addComponent(Entrar, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addComponent(repeticionPass)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(passRepeat))
                                 .addGroup(layout.createSequentialGroup()
                                     .addComponent(password)
                                     .addGap(18, 18, 18)
@@ -119,26 +137,42 @@ public class Ejercicio02_Usuarios extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(password)
                     .addComponent(contrasenaIntroducida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(54, 54, 54)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(repeticionPass)
+                    .addComponent(passRepeat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(17, 17, 17)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(Borrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(Entrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(44, 44, 44)
                 .addComponent(registro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void EntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EntrarActionPerformed
-        comprobacionUsuario();
+        if (passRepeat.isVisible() && repeticionPass.isVisible()) {
+            registroUsuario();
+        } else {
+            comprobacionUsuario();
+        }
     }//GEN-LAST:event_EntrarActionPerformed
 
     private void BorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BorrarActionPerformed
         usuarioIntroducido.setText("");
         contrasenaIntroducida.setText("");
+
+        repeticionPass.setVisible(false);
+        passRepeat.setVisible(false);
+        registro.setVisible(true);
     }//GEN-LAST:event_BorrarActionPerformed
+
+    private void registroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registroMouseClicked
+        registroUsuario();
+    }//GEN-LAST:event_registroMouseClicked
 
     /**
      * @param args the command line arguments
@@ -197,7 +231,20 @@ public class Ejercicio02_Usuarios extends javax.swing.JFrame {
             if (rs.next()) {
                 setTitle("Conectado");
             } else {
-                JOptionPane.showMessageDialog(null, "Procede al registro");
+                JOptionPane.showMessageDialog(null, "Procede al registro\n Intentos " + intentos++);
+
+                if (intentos == 3) {
+                    ps = conn.prepareStatement(
+                            "UPDATE usuario "
+                            + "SET blocked = 1 "
+                            + "WHERE login = ?");
+                    
+                    ps.setString(1, usuario);
+                    
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Cuenta bloqueada");
+                    intentos = 0;
+                }
             }
 
         } catch (SQLException ex) {
@@ -205,13 +252,48 @@ public class Ejercicio02_Usuarios extends javax.swing.JFrame {
         }
     }
 
+    private void registroUsuario() {
+        repeticionPass.setVisible(true);
+        passRepeat.setVisible(true);
+        registro.setVisible(false);
+
+        String nuevoUsuario = usuarioIntroducido.getText();
+        String password1 = new String(contrasenaIntroducida.getPassword());
+        String password2 = new String(passRepeat.getPassword());
+
+        if (!nuevoUsuario.isEmpty() && password1.length() > 0) {
+            if (password1.equals(password2)) {
+                try (Connection con = conexionBD()) {
+                    PreparedStatement ps = con.prepareStatement(
+                            "INSERT INTO usuario (login, password, blocked) VALUES (?, ?, ?)"
+                    );
+                    ps.setString(1, nuevoUsuario);
+                    ps.setString(2, password1);
+                    ps.setInt(3, 0);
+
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Usuario agregado");
+                } catch (SQLException ex) {
+                    Logger.getLogger(Ejercicio02_Usuarios.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Usuario y contraseña no pueden estar vacíos");
+        }
+    }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Borrar;
     private javax.swing.JButton Entrar;
     private javax.swing.JLabel User;
     private javax.swing.JPasswordField contrasenaIntroducida;
+    private javax.swing.JPasswordField passRepeat;
     private javax.swing.JLabel password;
     private javax.swing.JLabel registro;
+    private javax.swing.JLabel repeticionPass;
     private javax.swing.JTextField usuarioIntroducido;
     // End of variables declaration//GEN-END:variables
 }

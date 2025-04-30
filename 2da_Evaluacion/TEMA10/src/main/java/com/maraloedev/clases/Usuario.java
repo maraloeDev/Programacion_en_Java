@@ -21,6 +21,13 @@ public class Usuario {
         this.passowrd = passowrd;
         this.blocked = blocked;
     }
+    
+    public Usuario(String login, String passowrd) {
+        this.id_user = id_user;
+        this.login = login;
+        this.passowrd = passowrd;
+        this.blocked = blocked;
+    }
 
     public int getId_user() {
         return id_user;

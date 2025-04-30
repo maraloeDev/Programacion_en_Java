@@ -6,27 +6,36 @@ package com.maraloedev.Ejercicios;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Eduardo
  */
 public class Ejercicio02_Usuarios extends javax.swing.JFrame {
-    
-    static String url ="jdbc:mysql://localhost:3306/usuarios";
-    static String user ="root";
-    static String pass ="";
 
     /**
      * Creates new form Ejercicio02_Usuarios
      */
+    static final String URL = "jdbc:mysql://localhost:3306/usuarios";
+    static final String USER = "root";
+    static final String PASSWORD = "";
+
+    static PreparedStatement ps;
+    static ResultSet rs;
+
     public Ejercicio02_Usuarios() {
         initComponents();
         setFrame();
     }
-    
+
     private void setFrame() {
+        setTitle("Login");
         setResizable(false);
         setLocationRelativeTo(null);
     }
@@ -40,76 +49,96 @@ public class Ejercicio02_Usuarios extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        usuario = new javax.swing.JTextField();
-        jPasswordField1 = new javax.swing.JPasswordField();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
+        User = new javax.swing.JLabel();
+        password = new javax.swing.JLabel();
+        Borrar = new javax.swing.JButton();
+        Entrar = new javax.swing.JButton();
+        usuarioIntroducido = new javax.swing.JTextField();
+        contrasenaIntroducida = new javax.swing.JPasswordField();
+        registro = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("Usuario:");
+        User.setText("Usuario:");
 
-        jLabel2.setText("Contraseña:");
+        password.setText("Contraseña:");
 
-        jButton1.setIcon(new javax.swing.ImageIcon("C:\\Users\\Eduardo\\Desktop\\Programacion_en_Java\\2da_Evaluacion\\TEMA10\\src\\main\\java\\com\\maraloedev\\Imagenes\\Eliminacion.png")); // NOI18N
+        Borrar.setText("Borrar todo");
+        Borrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BorrarActionPerformed(evt);
+            }
+        });
 
-        jButton2.setIcon(new javax.swing.ImageIcon("C:\\Users\\Eduardo\\Desktop\\Programacion_en_Java\\2da_Evaluacion\\TEMA10\\src\\main\\java\\com\\maraloedev\\Imagenes\\Confirmacion.png")); // NOI18N
+        Entrar.setText("Validar");
+        Entrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EntrarActionPerformed(evt);
+            }
+        });
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 204));
-        jLabel3.setText("<html><u>¿Todavia no te has registrado?</html></u>");
+        registro.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        registro.setForeground(new java.awt.Color(0, 0, 204));
+        registro.setText("<html><u>¿Todavia no te has registrado?</html></u>");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(107, 107, 107)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(usuario, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
-                    .addComponent(jPasswordField1))
-                .addContainerGap(121, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(26, 26, 26)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(158, 158, 158))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(83, 83, 83))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(110, 110, 110)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(Borrar)
+                                .addGap(36, 36, 36)
+                                .addComponent(Entrar, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(password)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(contrasenaIntroducida))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(User)
+                                    .addGap(38, 38, 38)
+                                    .addComponent(usuarioIntroducido, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(90, 90, 90)
+                        .addComponent(registro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(83, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(91, 91, 91)
+                .addGap(97, 97, 97)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(usuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(User)
+                    .addComponent(usuarioIntroducido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(43, 43, 43)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(32, Short.MAX_VALUE))
+                    .addComponent(password)
+                    .addComponent(contrasenaIntroducida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(54, 54, 54)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(Borrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(Entrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(44, 44, 44)
+                .addComponent(registro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(29, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void EntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EntrarActionPerformed
+        comprobacionUsuario();
+    }//GEN-LAST:event_EntrarActionPerformed
+
+    private void BorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BorrarActionPerformed
+        usuarioIntroducido.setText("");
+        contrasenaIntroducida.setText("");
+    }//GEN-LAST:event_BorrarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -139,24 +168,50 @@ public class Ejercicio02_Usuarios extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Ejercicio02_Usuarios().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new Ejercicio02_Usuarios().setVisible(true);
         });
     }
-    
+
     private Connection conexionBD() throws SQLException {
-        return DriverManager.getConnection(url, user, pass);
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+
+    private void comprobacionUsuario() {
+        try (Connection conn = conexionBD()) {
+
+            ps = conn.prepareStatement(
+                    "SELECT * "
+                    + "FROM usuario "
+                    + "WHERE login = ? AND password = ?");
+
+            String usuario = usuarioIntroducido.getText();
+            String pass = new String(contrasenaIntroducida.getPassword());
+
+            // Doy valor a los ?
+            ps.setString(1, usuario);
+            ps.setString(2, pass);
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                setTitle("Conectado");
+            } else {
+                JOptionPane.showMessageDialog(null, "Procede al registro");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Ejercicio02_Usuarios.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JTextField usuario;
+    private javax.swing.JButton Borrar;
+    private javax.swing.JButton Entrar;
+    private javax.swing.JLabel User;
+    private javax.swing.JPasswordField contrasenaIntroducida;
+    private javax.swing.JLabel password;
+    private javax.swing.JLabel registro;
+    private javax.swing.JTextField usuarioIntroducido;
     // End of variables declaration//GEN-END:variables
 }

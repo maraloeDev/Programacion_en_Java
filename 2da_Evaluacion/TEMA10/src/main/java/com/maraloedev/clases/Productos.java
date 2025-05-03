@@ -1,8 +1,7 @@
 package com.maraloedev.clases;
 
-
 public class Productos {
-    
+
     private int idProducto;
     private String descripcion;
     private Double precio;
@@ -15,11 +14,6 @@ public class Productos {
         this.precio = precio;
         this.cantidad = cantidad;
         this.tipo = tipo;
-    }
-
-    public Productos() {
-        
-        
     }
 
     public int getIdProducto() {
@@ -61,9 +55,10 @@ public class Productos {
     public void setTipo(int tipo) {
         this.tipo = tipo;
     }
-    
-    @Override 
-    public String toString(){ 
-        return idProducto + ": " + descripcion + " --> " + precio + " €"; 
+
+    @Override
+    public String toString() {
+        return idProducto + ": " + descripcion + " --> " + precio + " €";
     }
+
 }

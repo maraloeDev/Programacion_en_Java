@@ -1,12 +1,12 @@
 package com.maraloedev.clases;
 
 
-public class TiposProducto {
+public class TiposProductos {
     
     private int idTipo;
     private Character tipo;
 
-    public TiposProducto(int idTipo, Character tipo) {
+    public TiposProductos(int idTipo, Character tipo) {
         this.idTipo = idTipo;
         this.tipo = tipo;
     }
@@ -31,4 +31,7 @@ public class TiposProducto {
     public String toString() {
         return String.valueOf(tipo);
     }
+    
+    
+    
 }

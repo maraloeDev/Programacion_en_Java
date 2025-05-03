@@ -1,7 +1,7 @@
 package com.maraloedev.Ejercicios;
 
 import com.maraloedev.clases.Productos;
-import com.maraloedev.clases.TiposProducto;
+import com.maraloedev.clases.TiposProductos;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,22 +15,20 @@ import javax.swing.JOptionPane;
 
 public class Ejercicio01_Almacen extends javax.swing.JFrame {
 
-    //modelos de combo y lista
-    static DefaultComboBoxModel modeloCombo = new DefaultComboBoxModel();
+    //Modelos lista y combo
     static DefaultListModel modeloLista = new DefaultListModel();
+    static DefaultComboBoxModel modeloCombo = new DefaultComboBoxModel();
 
-    //Conexion a la base de datos
+    //Conexiones base de datos
     static String url = "jdbc:mysql://localhost:3306/almacen";
     static String user = "root";
-    static String password = "";
-
-    //objetos base de datos
+    static String pasword = "";
     static PreparedStatement ps;
     static ResultSet rs;
-    
-    static Productos p;
 
-    static int tipoProducto = 0;
+    static Productos p;
+    static TiposProductos tp;
+    static int tipoProducto;
 
     /**
      * Creates new form Ejercicio01_Almacen
@@ -47,7 +45,7 @@ public class Ejercicio01_Almacen extends javax.swing.JFrame {
     }
 
     private void components() {
-        comboProductos();
+        tiposProductos();
     }
 
     /**
@@ -65,8 +63,8 @@ public class Ejercicio01_Almacen extends javax.swing.JFrame {
         listaProductos = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Almacén");
 
+        jLabel1.setDisplayedMnemonic('A');
         jLabel1.setText("Tipo producto:");
 
         comboProductos.addItemListener(new java.awt.event.ItemListener() {
@@ -75,10 +73,11 @@ public class Ejercicio01_Almacen extends javax.swing.JFrame {
             }
         });
 
-        listaProductos.setBorder(javax.swing.BorderFactory.createTitledBorder("Listado de productos"));
-        listaProductos.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                listaProductosValueChanged(evt);
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Listado de productos"));
+
+        listaProductos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                listaProductosMouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(listaProductos);
@@ -88,26 +87,25 @@ public class Ejercicio01_Almacen extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(96, 96, 96)
-                        .addComponent(jLabel1)
-                        .addGap(18, 18, 18)
-                        .addComponent(comboProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addGap(78, 78, 78)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(comboProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(50, 50, 50)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(comboProductos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(47, 47, 47)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(comboProductos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addGap(10, 10, 10)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -118,9 +116,9 @@ public class Ejercicio01_Almacen extends javax.swing.JFrame {
         listaProductos();
     }//GEN-LAST:event_comboProductosItemStateChanged
 
-    private void listaProductosValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listaProductosValueChanged
-        unidadesAlmacen();
-    }//GEN-LAST:event_listaProductosValueChanged
+    private void listaProductosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listaProductosMouseClicked
+        cantidadProductos();
+    }//GEN-LAST:event_listaProductosMouseClicked
 
     /**
      * @param args the command line arguments
@@ -155,90 +153,8 @@ public class Ejercicio01_Almacen extends javax.swing.JFrame {
         });
     }
 
-    private void comboProductos() {
-        comboProductos.setModel(modeloCombo);
-        try (Connection conn = conexionBD()) {
-            ps = conn.prepareStatement("SELECT * FROM tiposProducto");
-            rs = ps.executeQuery();
-            modeloCombo.addElement("(elige uno)");
-            while (rs.next()) {
-                int idTipo = rs.getInt("idTipo");
-                char tipo = rs.getString("tipo").charAt(0);
-                TiposProducto tp = new TiposProducto(idTipo, tipo);
-                modeloCombo.addElement(tp);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Ejercicio01_Almacen.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-
-    private void listaProductos() {
-        listaProductos.setModel(modeloLista);
-        modeloLista.clear();
-        try (Connection conn = conexionBD()) {
-            ps = conn.prepareStatement("SELECT * FROM productos WHERE tipo = ?");
-            String itemSeleccionado = modeloCombo.getSelectedItem().toString();
-            if (itemSeleccionado.equals("(elige uno)")) {
-                JOptionPane.showMessageDialog(null, "Selecciona un tipo de producto");
-                return;
-            }
-
-           TiposProducto seleccionado = (TiposProducto) modeloCombo.getSelectedItem();
-            tipoProducto = seleccionado.getIdTipo();  // ¡sin necesidad de switch!
-
-
-            //Doy valor al interrogante
-            ps.setInt(1, tipoProducto);
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                int idProducto = rs.getInt("idProducto");
-                String descripcion = rs.getString("descripcion");
-                Double precio = rs.getDouble("precio");
-                int cantidad = rs.getInt("cantidad");
-                int tipo = rs.getInt("tipo");
-                p = new Productos(idProducto, descripcion, precio, cantidad, tipo);
-                modeloLista.addElement(p.toString());
-            }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(Ejercicio01_Almacen.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private void unidadesAlmacen() {
-    try (Connection conn = conexionBD()) {
-        ps = conn.prepareStatement("SELECT cantidad FROM productos WHERE tipo = ?");
-        ps.setInt(1, tipoProducto); // Usamos el ID único del producto
-
-        rs = ps.executeQuery();
-        
-        while (rs.next()) {
-            
-        if(rs.next()) {
-            int cantidad = rs.getInt("cantidad");
-            if (cantidad < 10) {
-                JOptionPane.showMessageDialog(null, "Nº Unidades: " + cantidad + "\nDebajo del stock de seguridad");
-            } else {
-                JOptionPane.showMessageDialog(null, "Nº Unidades: " + cantidad);
-            }
-        }
-        }
-
-
-        rs.close();
-        ps.close();
-    } catch (SQLException ex) {
-        Logger.getLogger(Ejercicio01_Almacen.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}
-
-
-
     private Connection conexionBD() throws SQLException {
-        return DriverManager.getConnection(url, user, password);
-
+        return DriverManager.getConnection(url, user, pasword);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -248,4 +164,92 @@ public class Ejercicio01_Almacen extends javax.swing.JFrame {
     private javax.swing.JList<String> listaProductos;
     // End of variables declaration//GEN-END:variables
 
+    private void tiposProductos() {
+        comboProductos.setModel(modeloCombo);
+        modeloCombo.addElement("(elige uno)");
+        try (Connection conn = conexionBD()) {
+            ps = conn.prepareStatement("SELECT * FROM tiposproducto");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int idTipo = rs.getInt("idTipo");
+                Character tipo = rs.getString("tipo").charAt(0);
+
+                tp = new TiposProductos(idTipo, tipo);
+                modeloCombo.addElement(tp);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Ejercicio01_Almacen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void listaProductos() {
+        listaProductos.setModel(modeloLista);
+        modeloLista.clear();
+        try (Connection conn = conexionBD()) {
+            ps = conn.prepareStatement("SELECT * FROM productos WHERE tipo = ?");
+
+            String itemSeleccionado = modeloCombo.getSelectedItem().toString();
+
+            if (itemSeleccionado.contains(("(elige uno)"))) {
+                JOptionPane.showMessageDialog(null, "Elige un producto");
+                return;
+            }
+
+            tipoProducto = 0;
+
+            switch (itemSeleccionado) {
+                case "A":
+                    tipoProducto = 1;
+                    break;
+                case "B":
+                    tipoProducto = 2;
+                    break;
+                case "C":
+                    tipoProducto = 3;
+                default:
+                    JOptionPane.showMessageDialog(null, "tipo no encontrado");
+            }
+
+            ps.setInt(1, tipoProducto);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int idProducto = rs.getInt("idProducto");
+                String descripcion = rs.getString("descripcion");
+                Double precio = rs.getDouble("precio");
+                int cantidad = rs.getInt("cantidad");
+                int tipo = rs.getInt("tipo");
+                p = new Productos(idProducto, descripcion, precio, cantidad, tipo);
+                modeloLista.addElement(p);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Ejercicio01_Almacen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void cantidadProductos() {
+
+        try (Connection conn = conexionBD()) {
+            ps = conn.prepareStatement("SELECT cantidad FROM productos");
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                 int cantidad = rs.getInt("cantidad");
+                p.setCantidad(cantidad);
+
+                if (cantidad <= 10) {
+                    JOptionPane.showMessageDialog(null, "Nº unidades:" + cantidad + "\nDebajo del stock de seguridad", "Stock en almacén", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Nº unidades:" + cantidad, "Stock en almacén", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Ejercicio01_Almacen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
 }

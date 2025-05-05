@@ -1,12 +1,12 @@
 package com.maraloedev.clases;
 
 
-public class TiposProductos {
+public class TiposProducto {
     
     private int idTipo;
     private Character tipo;
 
-    public TiposProductos(int idTipo, Character tipo) {
+    public TiposProducto(int idTipo, Character tipo) {
         this.idTipo = idTipo;
         this.tipo = tipo;
     }

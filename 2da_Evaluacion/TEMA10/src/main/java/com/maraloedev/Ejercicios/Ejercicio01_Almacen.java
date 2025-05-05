@@ -1,7 +1,7 @@
 package com.maraloedev.Ejercicios;
 
 import com.maraloedev.clases.Productos;
-import com.maraloedev.clases.TiposProductos;
+import com.maraloedev.clases.TiposProducto;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,20 +15,24 @@ import javax.swing.JOptionPane;
 
 public class Ejercicio01_Almacen extends javax.swing.JFrame {
 
-    //Modelos lista y combo
-    static DefaultListModel modeloLista = new DefaultListModel();
-    static DefaultComboBoxModel modeloCombo = new DefaultComboBoxModel();
-
-    //Conexiones base de datos
+    //Credenciales de la base de datos
     static String url = "jdbc:mysql://localhost:3306/almacen";
     static String user = "root";
-    static String pasword = "";
+    static String password = "";
+
+    //Objetos para la CRUD de la base de datos
     static PreparedStatement ps;
     static ResultSet rs;
 
+    //Objetos de las tablas
     static Productos p;
-    static TiposProductos tp;
-    static int tipoProducto;
+    static TiposProducto tp;
+
+    static int tipoProd;
+
+    //Modelos combo-lista
+    static DefaultComboBoxModel modeloCombo = new DefaultComboBoxModel();
+    static DefaultListModel modeloLista = new DefaultListModel();
 
     /**
      * Creates new form Ejercicio01_Almacen
@@ -45,7 +49,8 @@ public class Ejercicio01_Almacen extends javax.swing.JFrame {
     }
 
     private void components() {
-        tiposProductos();
+        tiposProducto();
+        listaProductos();
     }
 
     /**
@@ -58,67 +63,67 @@ public class Ejercicio01_Almacen extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        comboProductos = new javax.swing.JComboBox<>();
+        comboProds = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
-        listaProductos = new javax.swing.JList<>();
+        listaProds = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Almacén");
 
-        jLabel1.setDisplayedMnemonic('A');
         jLabel1.setText("Tipo producto:");
 
-        comboProductos.addItemListener(new java.awt.event.ItemListener() {
+        comboProds.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                comboProductosItemStateChanged(evt);
+                comboProdsItemStateChanged(evt);
             }
         });
 
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Listado de productos"));
-
-        listaProductos.addMouseListener(new java.awt.event.MouseAdapter() {
+        listaProds.setBorder(javax.swing.BorderFactory.createTitledBorder("Listado de productos"));
+        listaProds.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                listaProductosMouseClicked(evt);
+                listaProdsMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(listaProductos);
+        jScrollPane1.setViewportView(listaProds);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(78, 78, 78)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(comboProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(72, 72, 72)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(comboProds, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(29, 29, 29)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 348, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(47, 47, 47)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(comboProductos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addGap(10, 10, 10)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(37, 37, 37)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(comboProds, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void comboProductosItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboProductosItemStateChanged
+    private void comboProdsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboProdsItemStateChanged
         listaProductos();
-    }//GEN-LAST:event_comboProductosItemStateChanged
+    }//GEN-LAST:event_comboProdsItemStateChanged
 
-    private void listaProductosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listaProductosMouseClicked
-        cantidadProductos();
-    }//GEN-LAST:event_listaProductosMouseClicked
+    private void listaProdsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listaProdsMouseClicked
+        mostrarCantidad();
+    }//GEN-LAST:event_listaProdsMouseClicked
 
     /**
      * @param args the command line arguments
@@ -154,102 +159,81 @@ public class Ejercicio01_Almacen extends javax.swing.JFrame {
     }
 
     private Connection conexionBD() throws SQLException {
-        return DriverManager.getConnection(url, user, pasword);
+        return DriverManager.getConnection(url, user, password);
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> comboProductos;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JList<String> listaProductos;
-    // End of variables declaration//GEN-END:variables
+    private void tiposProducto() {
+        comboProds.setModel(modeloCombo);
 
-    private void tiposProductos() {
-        comboProductos.setModel(modeloCombo);
-        modeloCombo.addElement("(elige uno)");
         try (Connection conn = conexionBD()) {
             ps = conn.prepareStatement("SELECT * FROM tiposproducto");
             rs = ps.executeQuery();
+            modeloCombo.addElement("(elige uno)");
 
             while (rs.next()) {
-                int idTipo = rs.getInt("idTipo");
-                Character tipo = rs.getString("tipo").charAt(0);
-
-                tp = new TiposProductos(idTipo, tipo);
-                modeloCombo.addElement(tp);
+                modeloCombo.addElement(tp = new TiposProducto(rs.getInt("idTipo"), rs.getString("tipo").charAt(0)));
             }
         } catch (SQLException ex) {
             Logger.getLogger(Ejercicio01_Almacen.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
 
     private void listaProductos() {
-        listaProductos.setModel(modeloLista);
+        listaProds.setModel(modeloLista);
         modeloLista.clear();
-        try (Connection conn = conexionBD()) {
-            ps = conn.prepareStatement("SELECT * FROM productos WHERE tipo = ?");
 
-            String itemSeleccionado = modeloCombo.getSelectedItem().toString();
+        try (Connection con = conexionBD()) {
+            ps = con.prepareStatement("SELECT * FROM productos WHERE tipo = ?");
+            //TIPO
+            String seleccionTipoProd = modeloCombo.getSelectedItem().toString();
 
-            if (itemSeleccionado.contains(("(elige uno)"))) {
-                JOptionPane.showMessageDialog(null, "Elige un producto");
+            if (seleccionTipoProd.equals("(elige uno)")) {
+                JOptionPane.showMessageDialog(null, "Selecciona un tipo de producto");
                 return;
             }
 
-            tipoProducto = 0;
-
-            switch (itemSeleccionado) {
-                case "A":
-                    tipoProducto = 1;
-                    break;
-                case "B":
-                    tipoProducto = 2;
-                    break;
-                case "C":
-                    tipoProducto = 3;
-                default:
-                    JOptionPane.showMessageDialog(null, "tipo no encontrado");
+            tipoProd = 0;
+            switch (seleccionTipoProd) {
+                case "A" ->
+                    tipoProd = 1;
+                case "B" ->
+                    tipoProd = 2;
+                case "C" ->
+                    tipoProd = 3;
             }
 
-            ps.setInt(1, tipoProducto);
+            ps.setInt(1, tipoProd);
 
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                int idProducto = rs.getInt("idProducto");
-                String descripcion = rs.getString("descripcion");
-                Double precio = rs.getDouble("precio");
-                int cantidad = rs.getInt("cantidad");
-                int tipo = rs.getInt("tipo");
-                p = new Productos(idProducto, descripcion, precio, cantidad, tipo);
-                modeloLista.addElement(p);
+                modeloLista.addElement(p = new Productos(
+                        rs.getInt("idProducto"),
+                        rs.getString("descripcion"),
+                        rs.getDouble("precio"),
+                        rs.getInt("cantidad"),
+                        rs.getInt("tipo")));
             }
         } catch (SQLException ex) {
             Logger.getLogger(Ejercicio01_Almacen.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    private void cantidadProductos() {
-
-        try (Connection conn = conexionBD()) {
-            ps = conn.prepareStatement("SELECT cantidad FROM productos");
-
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-
-                 int cantidad = rs.getInt("cantidad");
-                p.setCantidad(cantidad);
-
-                if (cantidad <= 10) {
-                    JOptionPane.showMessageDialog(null, "Nº unidades:" + cantidad + "\nDebajo del stock de seguridad", "Stock en almacén", JOptionPane.WARNING_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Nº unidades:" + cantidad, "Stock en almacén", JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Ejercicio01_Almacen.class.getName()).log(Level.SEVERE, null, ex);
+    
+    private void mostrarCantidad() {
+        int cantidad = p.getCantidad();
+        
+        if(cantidad <=10) {
+            JOptionPane.showMessageDialog(null, "Nº de unidades:"+cantidad+"\nDebajo del stock de seguridad");
+        } else {
+            JOptionPane.showMessageDialog(null, "Nº de unidades:"+cantidad);
         }
-
     }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> comboProds;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JList<String> listaProds;
+    // End of variables declaration//GEN-END:variables
 }

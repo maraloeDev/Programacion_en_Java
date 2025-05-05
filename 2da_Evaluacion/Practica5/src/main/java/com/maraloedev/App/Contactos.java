@@ -1,5 +1,7 @@
 package com.maraloedev.App;
 
+
+
 public class Contactos {
 
     private int idContacto;

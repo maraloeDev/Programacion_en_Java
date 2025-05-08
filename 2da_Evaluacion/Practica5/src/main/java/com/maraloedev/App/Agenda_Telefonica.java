@@ -1,6 +1,5 @@
 package com.maraloedev.App;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.TextArea;
 import java.awt.event.MouseAdapter;
@@ -15,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 
 public class Agenda_Telefonica extends javax.swing.JFrame {
 
@@ -44,7 +42,7 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
     /**
      * Metodo en el que el JFrame, lo situo en el centro de la pantalla, no
      * permito que el usuario no pueda maximizar la pantalla y por ultimo ambos
-     * botones de confirmacion se encuentran deshabilitados.
+     * botones de confirmacion se encuentran deshabilitados [47-54].
      */
     private void setFrame() {
         setLocationRelativeTo(null);
@@ -75,6 +73,7 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
         Nuevo = new javax.swing.JMenuItem();
         Buscar = new javax.swing.JMenuItem();
         Modificar = new javax.swing.JMenuItem();
+        Eliminar = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Agenda");
@@ -112,6 +111,14 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
             }
         });
         Contactos.add(Modificar);
+
+        Eliminar.setText("Eliminar");
+        Eliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EliminarActionPerformed(evt);
+            }
+        });
+        Contactos.add(Eliminar);
 
         jMenuBar1.add(Contactos);
 
@@ -168,6 +175,10 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
         modificarContacto();
     }//GEN-LAST:event_ModificarActionPerformed
 
+    private void EliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarActionPerformed
+        eliminarContacto();
+    }//GEN-LAST:event_EliminarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -204,20 +215,19 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
     /**
      * Metodo que activa los botones, almaceno el nombre y el telefono
      * introducido por el usuario, creo un evento en que si el usuario hace
-     * click en aceptar,
-     * se comprobaran que los datos introducidos de la siguiente manera:
-     *      - Si alguno de los componentes de texto esta vacio se lanzara una ex 
-     *      - Si la longitud del numero de telefono, es diferente de 9 [190-201]
-     * 
+     * click en aceptar, se comprobaran que los datos introducidos de la
+     * siguiente manera: - Si alguno de los componentes de texto esta vacio se
+     * lanzara una ex - Si la longitud del numero de telefono, es diferente de 9
+     * [232-252]
+     *
      * Una vez comprobado que todo esta correcto, se procedera a la creacion de
      * la consulta, haciendo una inserción en la base de datos, dando valor a
      * los ? con los valores introducidos por el usuario, una vez indicados los
      * valores, se notificara al usuario, que el contato a sigo agregado en la
-     * agenda [203-215]
-     * 
-     * Si el usuario da click en el boton Cancelar,
-     * se llamara al metodo setFrame()[42-47] .
+     * agenda [254-269]
      *
+     * Si el usuario da click en el boton Cancelar, se llamara al metodo
+     * setFrame()[271-277] .
      */
     private void creacionContacto() {
         nombreContacto.setText("");
@@ -265,108 +275,65 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
             }
         });
     }
-    
+
     /**
-     * Metodo en el que se almacenan en una lista los nombres 
-     * de los contactos, se intenta conectar a la BD, creo la consulta para 
-     * seleccionar todos los nombres, ejecuto la consulta, y mientras haya mas
-     * datos, almaceno el idContacto, el nombre y el telefono, creo en un objeto
-     * contacto para almacenar lo recuperado del rs, y agrego a la lista recupe-
-     * rando solamete el nombre [265-276]
-     * 
-     * Almaceno la variable seleccionUsuario un InputDialog en el que se mostra-
-     * ra en un comboBox, los valores almacenados en la lista, despues compruebo
-     * si lo seleccionado en el comboBox es diferente de nulo, de ser asi,
-     * se llamara al metodo datosContacto [283-293].
+     * Metodo que llama a nombreContactos(); [427] Almaceno la variable
+     * seleccionContacto un InputDialog en el que se mostra- ra en un comboBox,
+     * los valores almacenados en la lista, despues compruebo si lo seleccionado
+     * en el comboBox es diferente de nulo, de ser asi, se llamara al metodo
+     * datosContacto [287-300].
      */
     private void buscarContacto() {
-        nombreContactos = new ArrayList<>();
-        try (Connection conn = conexionBD()) {
-            String nombre = null;
-            ps = conn.prepareStatement("SELECT * FROM contactos");
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                int idContacto = rs.getInt("idContacto");
-                nombre = rs.getString("nombre");
-                String telefono = rs.getString("tf");
-                Contactos c = new Contactos(idContacto, nombre, telefono);
-                nombreContactos.add(c.getNombre());
-            }
-            
-            String seleccionUsuario = (String) JOptionPane.showInputDialog(
-                    null,
-                    "Nombre del contacto:",
-                    "Buscar contacto",
-                    JOptionPane.PLAIN_MESSAGE,
-                    null,
-                    nombreContactos.toArray(),
-                    null);
-            if (seleccionUsuario != null) {
-                datosContacto(seleccionUsuario);   
-            }
-            
-        } catch (SQLException ex) {
-            Logger.getLogger(Agenda_Telefonica.class.getName()).log(Level.SEVERE, null, ex);
+        nombreContactos();
+
+        String seleccionContacto = (String) JOptionPane.showInputDialog(
+                null,
+                "Nombre del contacto:",
+                "Buscar contacto",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                nombreContactos.toArray(),
+                null);
+        if (seleccionContacto != null) {
+            datosContacto(seleccionContacto);
         }
     }
-    
+
     /**
-     * Metodo en el que se almacenan en una lista los nombres 
-     * de los contactos, se intenta conectar a la BD, creo la consulta para 
-     * seleccionar todos los nombres, ejecuto la consulta, y mientras haya mas
-     * datos, almaceno el idContacto, el nombre y el telefono, creo en un objeto
-     * contacto para almacenar lo recuperado del rs, y agrego a la lista recupe-
-     * rando solamente el nombre [333-347]
-     * 
-     * Almaceno la variable modificarUsuario un InputDialog en el que se mostra-
-     * ra en un comboBox, los valores almacenados en la lista, despues compruebo
-     * si lo seleccionado en el comboBox es diferente de nulo, de ser asi,
-     * almaceno en una variable el nuevo nonbre, y en otra el telefono para int-
-     * roducir el nuevo nombre/telefono, compruebo que no esten vacios, intento
-     * conectarme a la base de datos, ejecuto la consulta de actualizaciín, doy va-
-     * lor a los ?, (1- nuevo mombre, 2- nuevoTelefono, 3-modificarUsuario (el 
-     * seleccionado en el ComboBox)) ejecuto la consulta, y muestro un mensaje
-     * de informacion al usuario[349-381].
+     * Metodo que llama a nombreContactos(); [427] Almaceno la variable
+     * modificarUsuario un InputDialog en el que se mostra- ra en un comboBox,
+     * los valores almacenados en la lista, despues compruebo si lo seleccionado
+     * en el comboBox es diferente de nulo, de ser asi, almaceno en una variable
+     * el nuevo nonbre, y en otra el telefono para int- roducir el nuevo
+     * nombre/telefono, compruebo que no esten vacios, intento conectarme a la
+     * base de datos, ejecuto la consulta de actualizaciín, doy va- lor a los ?,
+     * (1- nuevo mombre, 2- nuevoTelefono, 3-modificarUsuario (el seleccionado
+     * en el ComboBox)) ejecuto la consulta, y muestro un mensaje de informacion
+     * al usuario[314-349].
      */
-    
     private void modificarContacto() {
-        nombreContactos = new ArrayList<>();
-        try (Connection conn = conexionBD()) {
-            String nombre = null;
-            ps = conn.prepareStatement("SELECT * FROM contactos");
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                int idContacto = rs.getInt("idContacto");
-                nombre = rs.getString("nombre");
-                String telefono = rs.getString("tf");
-                Contactos c = new Contactos(idContacto, nombre, telefono);
-                nombreContactos.add(c.getNombre());
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Agenda_Telefonica.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        nombreContactos();
         String modificarUsuario = (String) JOptionPane.showInputDialog(
-                    null,
-                    "Nombre del contacto:",
-                    "Modificar contacto",
-                    JOptionPane.PLAIN_MESSAGE,
-                    null,
-                    nombreContactos.toArray(),
-                    null);
-        if(modificarUsuario!=null) {
+                null,
+                "Nombre del contacto:",
+                "Modificar contacto",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                nombreContactos.toArray(),
+                null);
+        if (modificarUsuario != null) {
             String nuevoNombre = JOptionPane.showInputDialog(null, "Introduce el nuevo nombre", "Estas editando el contacto " + modificarUsuario, JOptionPane.PLAIN_MESSAGE);
             if (nuevoNombre.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Los campos no deben estar vacios", "Error 0X00001", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+                JOptionPane.showMessageDialog(null, "Los campos no deben estar vacios", "Error 0X00001", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             String nuevoTelefono = JOptionPane.showInputDialog(null, "Introduce el nuevo telefono", "Estas editando el contacto " + modificarUsuario, JOptionPane.PLAIN_MESSAGE);
-                if (nuevoTelefono.length() != 9) {
-                    JOptionPane.showMessageDialog(null, "El número de telefono tiene que tener 9 digitos", "Error 0X00002", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            
-            try(Connection conn = conexionBD()) {
+            if (nuevoTelefono.length() != 9) {
+                JOptionPane.showMessageDialog(null, "El número de telefono tiene que tener 9 digitos", "Error 0X00002", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try (Connection conn = conexionBD()) {
                 ps = conn.prepareStatement("UPDATE contactos"
                         + " SET nombre = ?, tf= ?"
                         + "WHERE nombre = ? ");
@@ -380,53 +347,101 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
             }
         }
     }
-    
+
     /**
-     * Metodo en el que se le pasa el parametro el nombre del contacto a mostrar
-     * Creo una ventana, que contiene como titulo el nombre del contacto selec-
-     * cionado anteriormente en el ComboBox, establezco un tamaño para la venta-
-     * na, la posiciono en el medio e impido que el usuario la pueda maximizar
-     * Creo un TextArea que el usuario no puede editar [308-314].
-     * 
-     * Intento conectarme a la base de datos, creo la consulta recogiendo todo,
-     * donde el nombre sea el pasado por parametro, doy valor al ?, y mientras
-     * haya mas datos, almacenare en variables los datos del contacto, y mostra-
-     * re en el TextArea, los datos valores del contacto seleccionado, lo muest-
-     * o en la ventana y la hago visible [322-341]
+     * Metodo que llama al metodo nombreContactos(); [427] Almaceno la variable
+     * eliminacionContacto, intento conectarme a la base de datos, ejecuto la
+     * consulta de eliminación, doy valor al ?, 3-eliminacionContacto (el
+     * seleccionado en el ComboBox) ejecuto la consulta, y muestro un mensaje de
+     * informacion al usuario [360-379].
      */
-    private void datosContacto(String nombre) {
-    JFrame ventanaDatos = new JFrame("Datos de " + nombre);
-    ventanaDatos.setSize(new Dimension(400, 200));
-    ventanaDatos.setLocationRelativeTo(null);
-    ventanaDatos.setResizable(false);
-
-    TextArea infoContacto = new TextArea();
-    infoContacto.setEditable(false);
-
-    try (Connection con = conexionBD()) {
-        ps = con.prepareStatement("SELECT * FROM contactos WHERE nombre = ?");
-        ps.setString(1, nombre);
-        rs = ps.executeQuery();
-
-        while (rs.next()) {
-            int idContacto = rs.getInt("idContacto");
-            nombre = rs.getString("nombre");
-            String telefono = rs.getString("tf");
-            Contactos contacto = new Contactos(idContacto, nombre, telefono);
-            infoContacto.setText(contacto.toString());
+    private void eliminarContacto() {
+        nombreContactos();
+        String eliminacionContacto = (String) JOptionPane.showInputDialog(
+                null,
+                "Nombre del contacto:",
+                "Eliminar contacto",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                nombreContactos.toArray(),
+                null);
+        if (eliminacionContacto != null) {
+            try (Connection conn = conexionBD()) {
+                ps = conn.prepareStatement("DELETE FROM contactos WHERE nombre = ?");
+                ps.setString(1, eliminacionContacto);
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Contacto eliminado");
+            } catch (SQLException ex) {
+                Logger.getLogger(Agenda_Telefonica.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-
-    } catch (SQLException ex) {
-        Logger.getLogger(Agenda_Telefonica.class.getName()).log(Level.SEVERE, null, ex);
-        infoContacto.setText("Error al buscar contacto.");
     }
 
-    ventanaDatos.add(infoContacto);
-    ventanaDatos.setVisible(true);
-}
-    
-    
+    /**
+     * Metodo que llama a nombreContactos(); [427] Intento conectarme a la base
+     * de datos, creo la consulta recogiendo todo, donde el nombre sea el pasado
+     * por parametro, doy valor al ?, y mientras haya mas datos, almacenare en
+     * variables los datos del contacto, y mostra- re en el TextArea, los datos
+     * valores del contacto seleccionado, lo muest- ro en la ventana y la hago
+     * visible [383-412].
+     */
+    private void datosContacto(String nombre) {
+        JFrame ventanaDatos = new JFrame("Datos de " + nombre);
+        ventanaDatos.setSize(new Dimension(400, 200));
+        ventanaDatos.setLocationRelativeTo(null);
+        ventanaDatos.setResizable(false);
 
+        TextArea infoContacto = new TextArea();
+        infoContacto.setEditable(false);
+
+        try (Connection con = conexionBD()) {
+            ps = con.prepareStatement("SELECT * FROM contactos WHERE nombre = ?");
+            ps.setString(1, nombre);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int idContacto = rs.getInt("idContacto");
+                nombre = rs.getString("nombre");
+                String telefono = rs.getString("tf");
+                Contactos contacto = new Contactos(idContacto, nombre, telefono);
+                infoContacto.setText(contacto.toString());
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Agenda_Telefonica.class.getName()).log(Level.SEVERE, null, ex);
+            infoContacto.setText("Error al buscar contacto.");
+        }
+
+        ventanaDatos.add(infoContacto);
+        ventanaDatos.setVisible(true);
+    }
+    
+    /**
+     * Metodo en el que se almacenan en una lista los nombres de los contactos,
+     * se intenta conectar a la BD, creo la consulta para seleccionar todos los
+     * nombres, ejecuto la consulta, y mientras haya mas datos, almaceno el
+     * idContacto, el nombre y el telefono, creo en un objeto contacto para
+     * almacenar lo recuperado del rs, y agrego a la lista recupe- rando
+     * solamente el nombre [427-443].
+     */
+    private void nombreContactos() {
+        nombreContactos = new ArrayList<>();
+        try (Connection conn = conexionBD()) {
+            String nombre = null;
+            ps = conn.prepareStatement("SELECT * FROM contactos");
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                int idContacto = rs.getInt("idContacto");
+                nombre = rs.getString("nombre");
+                String telefono = rs.getString("tf");
+                Contactos c = new Contactos(idContacto, nombre, telefono);
+                nombreContactos.add(c.getNombre());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Agenda_Telefonica.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     /**
      * Metodo en el que se devuelven las credenciales de la base de datos para
      * la manipulacion de datos.
@@ -438,6 +453,7 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem Buscar;
     private javax.swing.JMenu Contactos;
+    private javax.swing.JMenuItem Eliminar;
     private javax.swing.JMenuItem Modificar;
     private javax.swing.JLabel Nombre;
     private javax.swing.JMenuItem Nuevo;

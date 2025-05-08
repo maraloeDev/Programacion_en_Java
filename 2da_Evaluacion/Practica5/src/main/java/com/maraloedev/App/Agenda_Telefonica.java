@@ -106,6 +106,11 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
         Contactos.add(Buscar);
 
         Modificar.setText("Modificar");
+        Modificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ModificarActionPerformed(evt);
+            }
+        });
         Contactos.add(Modificar);
 
         jMenuBar1.add(Contactos);
@@ -158,6 +163,10 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
     private void BuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BuscarActionPerformed
         buscarContacto();
     }//GEN-LAST:event_BuscarActionPerformed
+
+    private void ModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ModificarActionPerformed
+        modificarContacto();
+    }//GEN-LAST:event_ModificarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -298,6 +307,77 @@ public class Agenda_Telefonica extends javax.swing.JFrame {
             
         } catch (SQLException ex) {
             Logger.getLogger(Agenda_Telefonica.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    /**
+     * Metodo en el que se almacenan en una lista los nombres 
+     * de los contactos, se intenta conectar a la BD, creo la consulta para 
+     * seleccionar todos los nombres, ejecuto la consulta, y mientras haya mas
+     * datos, almaceno el idContacto, el nombre y el telefono, creo en un objeto
+     * contacto para almacenar lo recuperado del rs, y agrego a la lista recupe-
+     * rando solamente el nombre [333-347]
+     * 
+     * Almaceno la variable modificarUsuario un InputDialog en el que se mostra-
+     * ra en un comboBox, los valores almacenados en la lista, despues compruebo
+     * si lo seleccionado en el comboBox es diferente de nulo, de ser asi,
+     * almaceno en una variable el nuevo nonbre, y en otra el telefono para int-
+     * roducir el nuevo nombre/telefono, compruebo que no esten vacios, intento
+     * conectarme a la base de datos, ejecuto la consulta de actualizaciín, doy va-
+     * lor a los ?, (1- nuevo mombre, 2- nuevoTelefono, 3-modificarUsuario (el 
+     * seleccionado en el ComboBox)) ejecuto la consulta, y muestro un mensaje
+     * de informacion al usuario[349-381].
+     */
+    
+    private void modificarContacto() {
+        nombreContactos = new ArrayList<>();
+        try (Connection conn = conexionBD()) {
+            String nombre = null;
+            ps = conn.prepareStatement("SELECT * FROM contactos");
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                int idContacto = rs.getInt("idContacto");
+                nombre = rs.getString("nombre");
+                String telefono = rs.getString("tf");
+                Contactos c = new Contactos(idContacto, nombre, telefono);
+                nombreContactos.add(c.getNombre());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Agenda_Telefonica.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        String modificarUsuario = (String) JOptionPane.showInputDialog(
+                    null,
+                    "Nombre del contacto:",
+                    "Modificar contacto",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    nombreContactos.toArray(),
+                    null);
+        if(modificarUsuario!=null) {
+            String nuevoNombre = JOptionPane.showInputDialog(null, "Introduce el nuevo nombre", "Estas editando el contacto " + modificarUsuario, JOptionPane.PLAIN_MESSAGE);
+            if (nuevoNombre.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Los campos no deben estar vacios", "Error 0X00001", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            String nuevoTelefono = JOptionPane.showInputDialog(null, "Introduce el nuevo telefono", "Estas editando el contacto " + modificarUsuario, JOptionPane.PLAIN_MESSAGE);
+                if (nuevoTelefono.length() != 9) {
+                    JOptionPane.showMessageDialog(null, "El número de telefono tiene que tener 9 digitos", "Error 0X00002", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            
+            try(Connection conn = conexionBD()) {
+                ps = conn.prepareStatement("UPDATE contactos"
+                        + " SET nombre = ?, tf= ?"
+                        + "WHERE nombre = ? ");
+                ps.setString(1, nuevoNombre);
+                ps.setString(2, nuevoTelefono);
+                ps.setString(3, modificarUsuario);
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Contacto modificado");
+            } catch (SQLException ex) {
+                Logger.getLogger(Agenda_Telefonica.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     

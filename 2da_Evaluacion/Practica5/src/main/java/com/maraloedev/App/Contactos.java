@@ -40,8 +40,8 @@ public class Contactos {
 
     @Override
     public String toString() {
-        return "idContacto=" + idContacto
-                + "nombre=" + nombre
+        return "idContacto=" + idContacto +"\n"
+                + "nombre=" + nombre +"\n"
                 + "Telefono=" + tf;
     }
 

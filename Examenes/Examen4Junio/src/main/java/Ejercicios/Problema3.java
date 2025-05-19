@@ -10,7 +10,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,43 +20,54 @@ public class Problema3 {
     static String password = "";
     static PreparedStatement ps;
     static ResultSet rs;
-    static ArrayList<String> notas = new ArrayList<>();
-    static ArrayList<String> ids = new ArrayList<>();
-
-    static File f = new File("src\\main\\java\\Enunciados\\notas.txt");
 
     public static void main(String[] args) {
-        lecturaNotas();
+        lecturaFichero();
     }
 
-    private static void lecturaNotas() {
-        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-            String linea;
+    private static void lecturaFichero() {
+
+        try (BufferedReader br = new BufferedReader(new FileReader(new File("src\\main\\java\\Enunciados\\notas.txt")))) {
+
+            String linea = null;
 
             while ((linea = br.readLine()) != null) {
-                String[] separacion = linea.split(":");
-                String id = separacion[0];
-                String nota = separacion[1];
-                
+                String[] notasSuperiores = linea.split(":");
+                String id = notasSuperiores[0];
+                String notas = notasSuperiores[1];
+
                 try (Connection conn = conBD()) {
-                    if (Double.parseDouble(nota) >=5) {
-                    ps = conn.prepareStatement("INSERT INTO aprobados(id_alumno,nota) VALUES (?,?)");
-                    ps.setString(1, id);
-                    ps.setString(2, nota);
-                    ps.executeUpdate();
-                    System.out.println("notas agregadas");
+                    ps = conn.prepareStatement("SELECT * FROM aprobados WHERE id_alumno = ?");
+                    ps.setInt(1, Integer.parseInt(id));
+                    rs = ps.executeQuery();
+
+                    if (rs.next()) {
+                        System.out.println("Las notas ya estan agregadas");
+                        return;
+                    } else {
+
+                        if (Double.parseDouble(notas) >=5) {
+                        ps = conn.prepareStatement("INSERT INTO aprobados (id_alumno, nota) VALUES (?,?)");
+                        ps.setInt(1, Integer.parseInt(id));
+                        ps.setDouble(2, Double.parseDouble(notas));
+                            System.out.println("Notas agregadas");
+                        ps.executeUpdate();
+                            
+                            if(Double.parseDouble(notas) >=9) {
+                                
+                                Aprobados a = new Aprobados(Integer.parseInt(id), Double.parseDouble(notas));
+                                System.out.println(a);
+                                
+                            }
+                            
+                        }
                     }
-                    
-                    if(Double.parseDouble(nota) >=9) {
-                        System.out.println("id = " + id);
-                        System.out.println("notas = " + nota);
-                    }
-                    
-                    
+
                 } catch (SQLException ex) {
                     Logger.getLogger(Problema3.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Problema3.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -68,4 +78,5 @@ public class Problema3 {
     private static Connection conBD() throws SQLException {
         return DriverManager.getConnection(url, user, password);
     }
+
 }

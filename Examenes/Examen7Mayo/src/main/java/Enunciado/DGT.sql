@@ -31,65 +31,21 @@ USE `carnetdb`;
 
 CREATE TABLE `carnet` (
   `codigo` int(11) NOT NULL,
-  `dni_titular` varchar(10) DEFAULT NULL,
+  `titular` varchar(10) DEFAULT NULL,
   `puntos` int(11) NOT NULL CHECK (`puntos` between 0 and 15)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
+
 -- Volcado de datos para la tabla `carnet`
---
-
-INSERT INTO `carnet` (`codigo`, `dni_titular`, `puntos`) VALUES
-(1001, '12345678A', 12);
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `persona`
---
-
-CREATE TABLE `persona` (
-  `dni` varchar(10) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `apellidos` varchar(100) DEFAULT NULL,
-  `fecha_nacimiento` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `persona`
---
-
-INSERT INTO `persona` (`dni`, `nombre`, `apellidos`, `fecha_nacimiento`) VALUES
-('12345678A', 'Juan', 'Pérez Gómez', '1990-06-15');
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `carnet`
---
-ALTER TABLE `carnet`
-  ADD PRIMARY KEY (`codigo`),
-  ADD KEY `dni_titular` (`dni_titular`);
-
---
--- Indices de la tabla `persona`
---
-ALTER TABLE `persona`
-  ADD PRIMARY KEY (`dni`);
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `carnet`
---
-ALTER TABLE `carnet`
-  ADD CONSTRAINT `carnet_ibfk_1` FOREIGN KEY (`dni_titular`) REFERENCES `persona` (`dni`);
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+INSERT INTO `carnet` (`codigo`, `titular`, `puntos`) VALUES
+(1001, 'Juan', 12),
+(1002, 'María', 15),
+(1003, 'Carlos', 8),
+(1004, 'Lucía', 10),
+(1005, 'Javier', 7),
+(1006, 'Ana', 14),
+(1007, 'Miguel', 6),
+(1008, 'Laura', 13),
+(1009, 'Sergio', 9),
+(1010, 'Elena', 5),
+(1011, 'Pablo', 11);

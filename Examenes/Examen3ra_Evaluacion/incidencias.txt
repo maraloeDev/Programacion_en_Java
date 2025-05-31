@@ -1,2 +1,2 @@
-Fecha/Hora - operacion - CIF
-2025-05-17 - B - A47000098
+Fecha/Hora - Operacion - CIF
+2025-05-27-B-A47000098

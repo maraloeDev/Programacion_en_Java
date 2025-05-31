@@ -10,20 +10,26 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+/**
+ *
+ * @author Eduardo
+ */
 public class Problema2 extends javax.swing.JFrame {
 
     /**
      * Creates new form Problema2
      */
-    
     static String url = "jdbc:mysql://localhost:3306/carnetdb";
     static String user = "root";
     static String password = "";
     static PreparedStatement ps;
     static ResultSet rs;
-    static ArrayList<Carnet> listaCarnets;
-    
+    static ArrayList<Carnet> listaCarnets = new ArrayList<>();
+
     public Problema2() {
         initComponents();
         setLocationRelativeTo(null);
@@ -39,37 +45,47 @@ public class Problema2 extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        muestroDatos = new javax.swing.JTextArea();
+        areaCarnets = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
-        menuCrear = new javax.swing.JMenu();
-        menuBuscar = new javax.swing.JMenu();
-        menuMostrar = new javax.swing.JMenu();
+        creacionC = new javax.swing.JMenu();
+        crearCarnets = new javax.swing.JMenuItem();
+        buscarC = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        mostrarC = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Problema2");
 
-        muestroDatos.setColumns(20);
-        muestroDatos.setRows(5);
-        jScrollPane1.setViewportView(muestroDatos);
+        areaCarnets.setEditable(false);
+        areaCarnets.setColumns(20);
+        areaCarnets.setRows(5);
+        jScrollPane1.setViewportView(areaCarnets);
 
-        menuCrear.setText("Crear");
-        menuCrear.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                menuCrearMouseClicked(evt);
+        creacionC.setText("Crear");
+
+        crearCarnets.setText("Carnets");
+        crearCarnets.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                crearCarnetsActionPerformed(evt);
             }
         });
-        jMenuBar1.add(menuCrear);
+        creacionC.add(crearCarnets);
 
-        menuBuscar.setText("Buscar");
-        menuBuscar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                menuBuscarMouseClicked(evt);
+        jMenuBar1.add(creacionC);
+
+        buscarC.setText("Buscar");
+
+        jMenuItem1.setText("Por titular");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
             }
         });
-        jMenuBar1.add(menuBuscar);
+        buscarC.add(jMenuItem1);
 
-        menuMostrar.setText("Mostrar");
-        jMenuBar1.add(menuMostrar);
+        jMenuBar1.add(buscarC);
+
+        mostrarC.setText("Mostrar");
+        jMenuBar1.add(mostrarC);
 
         setJMenuBar(jMenuBar1);
 
@@ -77,23 +93,65 @@ public class Problema2 extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void menuCrearMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuCrearMouseClicked
+    private void crearCarnetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearCarnetsActionPerformed
         crearCarnets();
-    }//GEN-LAST:event_menuCrearMouseClicked
+    }//GEN-LAST:event_crearCarnetsActionPerformed
 
-    private void menuBuscarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuBuscarMouseClicked
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         buscarTitular();
-    }//GEN-LAST:event_menuBuscarMouseClicked
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void crearCarnets() {
+        boolean crear = true;
+        try (Connection conn = coneBD()) {
+            ps = conn.prepareStatement("SELECT * FROM carnet");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                listaCarnets.add(new Carnet(rs.getInt("codigo"), rs.getString("titular"), rs.getInt("puntos")));
+                crear = true;
+            }
+
+            if (crear) {
+                JOptionPane.showMessageDialog(null, "Carnets almacenados en la lista");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Problema2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void buscarTitular() {
+        areaCarnets.removeAll();
+        String nombreTitular = JOptionPane.showInputDialog(null, "Introcuzca el nombre del usuario a buscar");
+        boolean encontrado = false;
+
+        for (Carnet c : listaCarnets) {
+            if (nombreTitular.contains(c.getTitular())) {
+                areaCarnets.setText("Los puntos de " + nombreTitular + " son de " + c.getPuntos() + " puntos");
+                encontrado = true;
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println(encontrado);
+            areaCarnets.setText("No se a encontrado ningun carnet con ese nombre");
+        }
+    }
+
+    private Connection coneBD() throws SQLException {
+        return DriverManager.getConnection(url, user, password);
+    }
 
     /**
      * @param args the command line arguments
@@ -127,51 +185,16 @@ public class Problema2 extends javax.swing.JFrame {
             new Problema2().setVisible(true);
         });
     }
-    
-    private void crearCarnets() {
-        listaCarnets  = new ArrayList<>();
-        try(Connection conn = coneBD()) {
-            ps = conn.prepareStatement("SELECT * FROM carnet");
-            rs = ps.executeQuery();
-            while(rs.next()) {
-                int codigo = rs.getInt("codigo");
-                String dni_titular = rs.getString("dni_titular");
-                int puntos = rs.getInt("puntos");
-                Carnet c = new Carnet(codigo, dni_titular, puntos);
-                listaCarnets.add(c);
-                System.out.println("carnets agregados a la lista");
-            }
-            
-            if (!listaCarnets.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "La lista ya esta llena");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Problema2.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    private void buscarTitular() {
-        muestroDatos.removeAll();
-        muestroDatos.setEditable(false);
-         String titular = JOptionPane.showInputDialog(null, "Nombre de titular a buscar");
-         
-         for(Carnet busquedaTitular : listaCarnets) {
-             if(busquedaTitular.getTitular().equals(titular)) {
-                 muestroDatos.setText(String.valueOf(busquedaTitular.getPuntos()));
-             }
-         }
-    }
-    
-    private static Connection coneBD() throws SQLException {
-        return DriverManager.getConnection(url, user, password);
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea areaCarnets;
+    private javax.swing.JMenu buscarC;
+    private javax.swing.JMenu creacionC;
+    private javax.swing.JMenuItem crearCarnets;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JMenu menuBuscar;
-    private javax.swing.JMenu menuCrear;
-    private javax.swing.JMenu menuMostrar;
-    private javax.swing.JTextArea muestroDatos;
+    private javax.swing.JMenu mostrarC;
     // End of variables declaration//GEN-END:variables
+
 }
